@@ -6,4 +6,4 @@ python clean_data.py ./data/_temp_sample_data ./data/sample_data
 python gen_feature.py ./data/past_data ./data/ans_data ./data/sample_data ./data/feature_data
 # gen test data
 
-# rm _sampling_temp
+# rm [_temp_blah data]
