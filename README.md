@@ -1,6 +1,7 @@
 # DM
 Data Mining Final Project
 
+```
 // co-features
 1: collaboration times(ratio) of author1 and author2
 2: last collaboration time of author1 and author2
@@ -19,3 +20,4 @@ Data Mining Final Project
 14: last publicaiton time of author2
 
 // time feature can use real number to represent, such as 2013->1000 2012->500 2011->200 2010->100
+```
