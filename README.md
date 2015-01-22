@@ -18,5 +18,4 @@ Data Mining Final Project
 13: last publication time of author1
 14: last publicaiton time of author2
 
-
 // time feature can use real number to represent, such as 2013->1000 2012->500 2011->200 2010->100
