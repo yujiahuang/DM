@@ -279,6 +279,7 @@ def createHash():
 
 def gen_features_thru_hash(author_pair):
 
+
   P = [[],[]]
   P[0] = author_hash[author_pair[0]][0]
   P[1] = author_hash[author_pair[1]][0]
@@ -409,13 +410,13 @@ def main():
   #     output_file.write(' {0}:{1}'.format(i+1, f))
   #   output_file.write('\n')
 
-  if len(sys.argv)>4 and sys.argv[4]==1:
+  if len(sys.argv)>4 and sys.argv[4]=='1':
 
     createHash()
 
     
-    for ap, v in co_hash:
-      label = 0
+    for ap in co_hash:
+      label = get_label(ap[0], ap[1]) if ans_data else 0
       features = gen_features_thru_hash((ap[0], ap[1]))
       output_file.write(label)
       for i, f in enumerate(features):
