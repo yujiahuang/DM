@@ -2,29 +2,19 @@
 ##Data Mining Final Project
 
 
-P1: total number of papers of author1
+#####P1: total number of papers of author1
+#####P2: total number of papers of author2
+#####P12: total number of papers in collaboration of author1. and author2
+#####CR1: total number of collaborators of author1
+#####CR2: total number of collaborators of author2
+#####CN1: total number of collaborations of author1
+#####CN2: total number of collaborations of author2
+#####CN12: total number of collaborations of author1. and author2 (=P12)
+#####W1: weighted publication sum of papers of author1. ((2008->1, 2009->2, ..., 2012->5))
+#####W2: weighted publication sum of papers of author2 ((2008->1, 2009->2, ..., 2012->5))
+#####W12: weighted collaboration sum of author1. and author2 (2008->1, 2009->2, ..., 2012->5)
 
-P2: total number of papers of author2
-
-P12: total number of papers in collaboration of author1. and author2
-
-CR1: total number of collaborators of author1
-
-CR2: total number of collaborators of author2
-
-CN1: total number of collaborations of author1
-
-CN2: total number of collaborations of author2
-
-CN12: total number of collaborations of author1. and author2 (=P12)
-
-W1: weighted publication sum of papers of author1. ((2008->1, 2009->2, ..., 2012->5))
-
-W2: weighted publication sum of papers of author2 ((2008->1, 2009->2, ..., 2012->5))
-
-W12: weighted collaboration sum of author1. and author2 (2008->1, 2009->2, ..., 2012->5)
-
-id is not included as a feature
+* id is not included as a feature
 
 
 1. P1
@@ -59,8 +49,8 @@ id is not included as a feature
 1. how many times author1. and author2 publish in the same conference (MAX_i(author1. and author2 in conf_i))
 
 all time features has the following formats
-*. linear: 1, 2, 3, ...
-*. quadratic: 1, 4, 9, ...
-*. exponential: 2, 4, 8, ...
+* linear: 1, 2, 3, ...
+* quadratic: 1, 4, 9, ...
+* exponential: 2, 4, 8, ...
 
 
