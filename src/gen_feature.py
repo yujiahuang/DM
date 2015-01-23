@@ -1,4 +1,4 @@
-# python gen_feature.py (1)past_data (2)ans_data (3)data_to_be_processed
+# python gen_feature.py (1)past_data (2)ans_data (3)data_to_be_processed (4)is_all?
 
 import sys
 from collections import OrderedDict
@@ -159,6 +159,140 @@ def gen_features_thru_graph(author_pair):
     nx.single_source_shortest_path_length(author_paper_graph, author_pair[0], 2), 2)
   CN[1] = getKeysWithValue(
     nx.single_source_shortest_path_length(author_paper_graph, author_pair[1], 2), 2)
+  print CN
+
+  # gen weighted paper sum
+  weighted = [0, 0, 0]
+  for i in [0, 1]:
+    for paper in P[i]:
+      paper_attr = paper.split(' ')
+      weighted[i] += int(paper_attr[0][4:])-2007
+  for paper in co_papers:
+    paper_attr = paper.split(' ')
+    weighted[2] += int(paper_attr[0][4:])-2007
+
+  # basic counts
+  P_count = [ len(P[0]), 
+              len(P[1]),
+              len(co_papers) ]
+  CR_count = [len(CR[0]), 
+              len(CR[1])]
+  CN_count = [len(CN[0]), 
+              len(CN[1]),]
+
+  # co ratios
+  first_co_ratio1 = float(P_count[2])/float(P_count[0])
+  first_co_ratio2 = float(P_count[2])/float(P_count[1])
+  first_co_ratio12 = float(P_count[2])/float(P_count[0] + P_count[1])
+  second_co_ratio1 = float(P_count[2])/float(CN_count[0])
+  second_co_ratio2 = float(P_count[2])/float(CN_count[1])
+  second_co_ratio12 = float(P_count[2])/float(CN_count[0] + CN_count[1])
+  third_co_ratio1 = 1.0/float(CR_count[0])
+  third_co_ratio2 = 1.0/float(CR_count[1])
+  forth_co_ratio1 = float(weighted[2])/float(weighted[0])
+  forth_co_ratio2 = float(weighted[2])/float(weighted[1])
+  
+  # same conference
+  same_conf = {}
+  for paper in co_papers:
+    paper_attr = paper.split(' ')
+    if paper_attr[1] in same_conf:
+      same_conf[paper_attr[1]] += 1
+    else:
+      same_conf[paper_attr[1]] = 1
+  num_same_conf = max(same_conf.values())
+    
+  # last publication year
+  last_pub_year_lin = [0, 0, 0]
+  last_pub_year_qua = [0, 0, 0]
+  last_pub_year_exp = [0, 0, 0]
+  for i in [0, 1]:
+    for paper in P[i]:
+      paper_attr = paper.split(' ')
+      new_year = int(paper_attr[0][4:])-2007
+      old_year = int(last_pub_year_lin[i])
+      if new_year > old_year:
+        last_pub_year_lin[i] = new_year
+        last_pub_year_qua[i] = new_year**2
+        last_pub_year_exp[i] = 2**new_year
+
+  for path in co_papers:
+    paper_attr = paper.split(' ')
+    new_year = int(paper_attr[0][4:])-2007
+    old_year = int(last_pub_year_lin[2])
+    if new_year > old_year:
+      last_pub_year_lin[2] = new_year
+      last_pub_year_qua[2] = new_year**2
+      last_pub_year_exp[2] = 2**new_year
+
+
+  # all features
+  features = (
+              P_count[0], P_count[1], CR_count[0], CR_count[1], CN_count[0], CN_count[1], 
+              weighted[0], weighted[1], 
+              last_pub_year_lin[0], last_pub_year_qua[0], last_pub_year_exp[0], 
+              last_pub_year_lin[1], last_pub_year_qua[1], last_pub_year_exp[1], 
+              P_count[2], weighted[2], first_co_ratio1, first_co_ratio2, first_co_ratio12, 
+              second_co_ratio1, second_co_ratio2, second_co_ratio12,
+              third_co_ratio1, third_co_ratio2, forth_co_ratio1, forth_co_ratio2, 
+              last_pub_year_lin[2], last_pub_year_qua[2], last_pub_year_exp[2],
+              num_same_conf
+              )
+  return features
+
+# author_hash has key the author id and value in the following format:
+# [ P[...], CR[...], CN[...] ]
+# co_hash has key the author pair and value co_papers
+author_hash = {}
+co_hash = {}
+def createHash():
+  for line in past_data:
+    tokens = line.split(' ')
+
+    paper_id = 'year' + tokens[2] + ' conf' + tokens[3] + ' paper'+tokens[4]
+
+    # gen author hash
+    for i in [0, 1]:
+      j = 1 if i==0 else 0
+      collaboration = 'author' + tokens[j] + ' ' + paper_id
+      if tokens[i] in author_hash:
+        P = author_hash[tokens[i]][0]
+        CR = author_hash[tokens[i]][1]
+        CN = author_hash[tokens[i]][2]
+        if paper_id not in P: author_hash[tokens[i]][0].append(paper_id)
+        if tokens[j] not in CR: author_hash[tokens[i]][1].append(tokens[j])
+        if collaboration not in CN: author_hash[tokens[i]][2].append(collaboration)
+      else:
+        author_hash[tokens[i]] = [ [], [], [] ]
+        author_hash[tokens[i]][0].append(paper_id)
+        author_hash[tokens[i]][1].append(tokens[j])
+        author_hash[tokens[i]][2].append(collaboration)
+
+    # gen co hash
+    if (tokens[0], tokens[1]) in co_hash:
+      co_papers = co_hash[(tokens[0], tokens[1])]
+      if paper_id not in co_papers: co_hash[(tokens[0], tokens[1])].append(paper_id)
+    else:
+      co_hash[(tokens[0], tokens[1])] = [ paper_id ]
+
+  past_data.seek(0)
+
+def gen_features_thru_hash(author_pair):
+
+  P = [[],[]]
+  P[0] = author_hash[author_pair[0]][0]
+  P[1] = author_hash[author_pair[1]][0]
+  
+
+  CR = [[],[]]
+  CR[0] = author_hash[author_pair[0]][1]
+  CR[1] = author_hash[author_pair[1]][1]
+
+  co_papers = co_hash[author_pair]
+
+  CN = [[],[]]
+  CN[0] = author_hash[author_pair[0]][2]
+  CN[1] = author_hash[author_pair[1]][2]
 
   # gen weighted paper sum
   weighted = [0, 0, 0]
@@ -260,22 +394,49 @@ def getKeysWithValue(dict, v):
 # main
 def main():
 
-  createGraphs()
+  # createGraphs()
 
-  author_pairs = getAuthorPairs()
-  for ap in author_pairs:
+  # author_pairs = getAuthorPairs()
+  # for ap in author_pairs:
 
-    label = get_label(ap[0], ap[1]) if ans_data else 0
+  #   label = get_label(ap[0], ap[1]) if ans_data else 0
 
-    # features = gen_features(ap[0], ap[1])
-    features = gen_features_thru_graph(('author'+ap[0], 'author'+ap[1]))
+  #   # features = gen_features(ap[0], ap[1])
+  #   features = gen_features_thru_graph(('author'+ap[0], 'author'+ap[1]))
 
-    output_file.write(label)
-    for i, f in enumerate(features):
-      output_file.write(' {0}:{1}'.format(i+1, f))
-    output_file.write('\n')
+  #   output_file.write(label)
+  #   for i, f in enumerate(features):
+  #     output_file.write(' {0}:{1}'.format(i+1, f))
+  #   output_file.write('\n')
 
+  if len(sys.argv)>4 and sys.argv[4]==1:
 
+    createHash()
+
+    
+    for ap, v in co_hash:
+      label = 0
+      features = gen_features_thru_hash((ap[0], ap[1]))
+      output_file.write(label)
+      for i, f in enumerate(features):
+        output_file.write(' {0}:{1}'.format(i+1, f))
+      output_file.write('\n')
+
+  else:
+
+    createHash()
+
+    author_pairs = getAuthorPairs()
+    for ap in author_pairs:
+
+      label = get_label(ap[0], ap[1]) if ans_data else 0
+
+      features = gen_features_thru_hash((ap[0], ap[1]))
+
+      output_file.write(label)
+      for i, f in enumerate(features):
+        output_file.write(' {0}:{1}'.format(i+1, f))
+      output_file.write('\n')
 
 
 
