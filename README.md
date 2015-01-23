@@ -1,7 +1,7 @@
 # DM
 Data Mining Final Project
 
-```
+
 P1: total number of papers of author1
 P2: total number of papers of author2
 P12: total number of papers in collaboration of author1 and author2
@@ -53,4 +53,4 @@ o. linear: 1, 2, 3, ...
 o. quadratic: 1, 4, 9, ...
 o. exponential: 2, 4, 8, ...
 
-```
+
