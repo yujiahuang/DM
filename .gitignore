@@ -3,4 +3,6 @@ dataset/CN2.txt
 dataset/CN3.txt
 src/lib/libsvm
 src/lib/libsvm-mac
-
+results
+src/data
+EC2Key.pem

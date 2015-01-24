@@ -1,8 +1,8 @@
 # python gen_feature.py (1)past_data (2)ans_data (3)data_to_be_processed (4)is_all?
 
 import sys
-from collections import OrderedDict
-import networkx as nx
+# from collections import OrderedDict
+# import networkx as nx
 
 # open input
 input_file = open(sys.argv[3], 'r')
@@ -121,124 +121,124 @@ def get_label(author1, author2):
 
 # author_paper_graph takes author and conference as nodes
 # author_graph only take author
-author_paper_graph = nx.Graph()
-author_graph = nx.Graph()
+# author_paper_graph = nx.Graph()
+# author_graph = nx.Graph()
 
-def createGraphs():
-  for line in past_data: 
-    tokens = line.split(' ')
-    paper_id = 'year' + tokens[2] + ' conf' + tokens[3] + ' paper'+tokens[4]
-    author_paper_graph.add_edge('author'+tokens[0], paper_id)
-    author_paper_graph.add_edge('author'+tokens[1], paper_id)
-    author_graph.add_edge('author'+tokens[0], 'author'+tokens[1])
-  past_data.seek(0)
+# def createGraphs():
+#   for line in past_data: 
+#     tokens = line.split(' ')
+#     paper_id = 'year' + tokens[2] + ' conf' + tokens[3] + ' paper'+tokens[4]
+#     author_paper_graph.add_edge('author'+tokens[0], paper_id)
+#     author_paper_graph.add_edge('author'+tokens[1], paper_id)
+#     author_graph.add_edge('author'+tokens[0], 'author'+tokens[1])
+#   past_data.seek(0)
 
-def gen_features_thru_graph(author_pair):
-  # P1, P2, P12, CR1, CR2, CN1, CN2 = [], [] ,[], [], [], [], []
-  # Pi = Publications of i, CRi = collaborators of i, CNi = collaborations of i
-  # here CN12 = P12
+# def gen_features_thru_graph(author_pair):
+#   # P1, P2, P12, CR1, CR2, CN1, CN2 = [], [] ,[], [], [], [], []
+#   # Pi = Publications of i, CRi = collaborators of i, CNi = collaborations of i
+#   # here CN12 = P12
 
-  # all lists
-  P = [[],[]]
-  P[0] = getKeysWithValue(
-    nx.single_source_shortest_path_length(author_paper_graph, author_pair[0], 1), 1)
-  P[1] = getKeysWithValue(
-    nx.single_source_shortest_path_length(author_paper_graph, author_pair[1], 1), 1)
+#   # all lists
+#   P = [[],[]]
+#   P[0] = getKeysWithValue(
+#     nx.single_source_shortest_path_length(author_paper_graph, author_pair[0], 1), 1)
+#   P[1] = getKeysWithValue(
+#     nx.single_source_shortest_path_length(author_paper_graph, author_pair[1], 1), 1)
   
 
-  CR = [[],[]]
-  CR[0] = getKeysWithValue(
-    nx.single_source_shortest_path_length(author_graph, author_pair[0], 1), 1)
-  CR[1] = getKeysWithValue(
-    nx.single_source_shortest_path_length(author_graph, author_pair[1], 1), 1)
+#   CR = [[],[]]
+#   CR[0] = getKeysWithValue(
+#     nx.single_source_shortest_path_length(author_graph, author_pair[0], 1), 1)
+#   CR[1] = getKeysWithValue(
+#     nx.single_source_shortest_path_length(author_graph, author_pair[1], 1), 1)
 
-  co_papers = sorted(nx.common_neighbors(author_paper_graph, author_pair[0], author_pair[1]))
+#   co_papers = sorted(nx.common_neighbors(author_paper_graph, author_pair[0], author_pair[1]))
 
-  CN = [[],[]]
-  CN[0] = getKeysWithValue(
-    nx.single_source_shortest_path_length(author_paper_graph, author_pair[0], 2), 2)
-  CN[1] = getKeysWithValue(
-    nx.single_source_shortest_path_length(author_paper_graph, author_pair[1], 2), 2)
-  print CN
+#   CN = [[],[]]
+#   CN[0] = getKeysWithValue(
+#     nx.single_source_shortest_path_length(author_paper_graph, author_pair[0], 2), 2)
+#   CN[1] = getKeysWithValue(
+#     nx.single_source_shortest_path_length(author_paper_graph, author_pair[1], 2), 2)
+#   print CN
 
-  # gen weighted paper sum
-  weighted = [0, 0, 0]
-  for i in [0, 1]:
-    for paper in P[i]:
-      paper_attr = paper.split(' ')
-      weighted[i] += int(paper_attr[0][4:])-2007
-  for paper in co_papers:
-    paper_attr = paper.split(' ')
-    weighted[2] += int(paper_attr[0][4:])-2007
+#   # gen weighted paper sum
+#   weighted = [0, 0, 0]
+#   for i in [0, 1]:
+#     for paper in P[i]:
+#       paper_attr = paper.split(' ')
+#       weighted[i] += int(paper_attr[0][4:])-2007
+#   for paper in co_papers:
+#     paper_attr = paper.split(' ')
+#     weighted[2] += int(paper_attr[0][4:])-2007
 
-  # basic counts
-  P_count = [ len(P[0]), 
-              len(P[1]),
-              len(co_papers) ]
-  CR_count = [len(CR[0]), 
-              len(CR[1])]
-  CN_count = [len(CN[0]), 
-              len(CN[1]),]
+#   # basic counts
+#   P_count = [ len(P[0]), 
+#               len(P[1]),
+#               len(co_papers) ]
+#   CR_count = [len(CR[0]), 
+#               len(CR[1])]
+#   CN_count = [len(CN[0]), 
+#               len(CN[1]),]
 
-  # co ratios
-  first_co_ratio1 = float(P_count[2])/float(P_count[0])
-  first_co_ratio2 = float(P_count[2])/float(P_count[1])
-  first_co_ratio12 = float(P_count[2])/float(P_count[0] + P_count[1])
-  second_co_ratio1 = float(P_count[2])/float(CN_count[0])
-  second_co_ratio2 = float(P_count[2])/float(CN_count[1])
-  second_co_ratio12 = float(P_count[2])/float(CN_count[0] + CN_count[1])
-  third_co_ratio1 = 1.0/float(CR_count[0])
-  third_co_ratio2 = 1.0/float(CR_count[1])
-  forth_co_ratio1 = float(weighted[2])/float(weighted[0])
-  forth_co_ratio2 = float(weighted[2])/float(weighted[1])
+#   # co ratios
+#   first_co_ratio1 = float(P_count[2])/float(P_count[0])
+#   first_co_ratio2 = float(P_count[2])/float(P_count[1])
+#   first_co_ratio12 = float(P_count[2])/float(P_count[0] + P_count[1])
+#   second_co_ratio1 = float(P_count[2])/float(CN_count[0])
+#   second_co_ratio2 = float(P_count[2])/float(CN_count[1])
+#   second_co_ratio12 = float(P_count[2])/float(CN_count[0] + CN_count[1])
+#   third_co_ratio1 = 1.0/float(CR_count[0])
+#   third_co_ratio2 = 1.0/float(CR_count[1])
+#   forth_co_ratio1 = float(weighted[2])/float(weighted[0])
+#   forth_co_ratio2 = float(weighted[2])/float(weighted[1])
   
-  # same conference
-  same_conf = {}
-  for paper in co_papers:
-    paper_attr = paper.split(' ')
-    if paper_attr[1] in same_conf:
-      same_conf[paper_attr[1]] += 1
-    else:
-      same_conf[paper_attr[1]] = 1
-  num_same_conf = max(same_conf.values())
+#   # same conference
+#   same_conf = {}
+#   for paper in co_papers:
+#     paper_attr = paper.split(' ')
+#     if paper_attr[1] in same_conf:
+#       same_conf[paper_attr[1]] += 1
+#     else:
+#       same_conf[paper_attr[1]] = 1
+#   num_same_conf = max(same_conf.values())
     
-  # last publication year
-  last_pub_year_lin = [0, 0, 0]
-  last_pub_year_qua = [0, 0, 0]
-  last_pub_year_exp = [0, 0, 0]
-  for i in [0, 1]:
-    for paper in P[i]:
-      paper_attr = paper.split(' ')
-      new_year = int(paper_attr[0][4:])-2007
-      old_year = int(last_pub_year_lin[i])
-      if new_year > old_year:
-        last_pub_year_lin[i] = new_year
-        last_pub_year_qua[i] = new_year**2
-        last_pub_year_exp[i] = 2**new_year
+#   # last publication year
+#   last_pub_year_lin = [0, 0, 0]
+#   last_pub_year_qua = [0, 0, 0]
+#   last_pub_year_exp = [0, 0, 0]
+#   for i in [0, 1]:
+#     for paper in P[i]:
+#       paper_attr = paper.split(' ')
+#       new_year = int(paper_attr[0][4:])-2007
+#       old_year = int(last_pub_year_lin[i])
+#       if new_year > old_year:
+#         last_pub_year_lin[i] = new_year
+#         last_pub_year_qua[i] = new_year**2
+#         last_pub_year_exp[i] = 2**new_year
 
-  for path in co_papers:
-    paper_attr = paper.split(' ')
-    new_year = int(paper_attr[0][4:])-2007
-    old_year = int(last_pub_year_lin[2])
-    if new_year > old_year:
-      last_pub_year_lin[2] = new_year
-      last_pub_year_qua[2] = new_year**2
-      last_pub_year_exp[2] = 2**new_year
+#   for path in co_papers:
+#     paper_attr = paper.split(' ')
+#     new_year = int(paper_attr[0][4:])-2007
+#     old_year = int(last_pub_year_lin[2])
+#     if new_year > old_year:
+#       last_pub_year_lin[2] = new_year
+#       last_pub_year_qua[2] = new_year**2
+#       last_pub_year_exp[2] = 2**new_year
 
 
-  # all features
-  features = (
-              P_count[0], P_count[1], CR_count[0], CR_count[1], CN_count[0], CN_count[1], 
-              weighted[0], weighted[1], 
-              last_pub_year_lin[0], last_pub_year_qua[0], last_pub_year_exp[0], 
-              last_pub_year_lin[1], last_pub_year_qua[1], last_pub_year_exp[1], 
-              P_count[2], weighted[2], first_co_ratio1, first_co_ratio2, first_co_ratio12, 
-              second_co_ratio1, second_co_ratio2, second_co_ratio12,
-              third_co_ratio1, third_co_ratio2, forth_co_ratio1, forth_co_ratio2, 
-              last_pub_year_lin[2], last_pub_year_qua[2], last_pub_year_exp[2],
-              num_same_conf
-              )
-  return features
+#   # all features
+#   features = (
+#               P_count[0], P_count[1], CR_count[0], CR_count[1], CN_count[0], CN_count[1], 
+#               weighted[0], weighted[1], 
+#               last_pub_year_lin[0], last_pub_year_qua[0], last_pub_year_exp[0], 
+#               last_pub_year_lin[1], last_pub_year_qua[1], last_pub_year_exp[1], 
+#               P_count[2], weighted[2], first_co_ratio1, first_co_ratio2, first_co_ratio12, 
+#               second_co_ratio1, second_co_ratio2, second_co_ratio12,
+#               third_co_ratio1, third_co_ratio2, forth_co_ratio1, forth_co_ratio2, 
+#               last_pub_year_lin[2], last_pub_year_qua[2], last_pub_year_exp[2],
+#               num_same_conf
+#               )
+#   return features
 
 # author_hash has key the author id and value in the following format:
 # [ P[...], CR[...], CN[...] ]
