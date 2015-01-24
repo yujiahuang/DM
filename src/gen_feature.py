@@ -414,14 +414,25 @@ def main():
 
     createHash()
 
-    
+    c = 0
     for ap in co_hash:
-      label = get_label(ap[0], ap[1]) if ans_data else 0
-      features = gen_features_thru_hash((ap[0], ap[1]))
-      output_file.write(label)
-      for i, f in enumerate(features):
-        output_file.write(' {0}:{1}'.format(i+1, f))
-      output_file.write('\n')
+      label = get_label(ap[0], ap[1]) if ans_data else '0'
+      if label=='+1':
+
+        features = gen_features_thru_hash((ap[0], ap[1]))
+        output_file.write(label)
+        for i, f in enumerate(features):
+          output_file.write(' {0}:{1}'.format(i+1, f))
+        output_file.write('\n')
+      else:
+        if c%9==0:
+          features = gen_features_thru_hash((ap[0], ap[1]))
+          output_file.write(label)
+          for i, f in enumerate(features):
+            output_file.write(' {0}:{1}'.format(i+1, f))
+          output_file.write('\n')
+          c = 0
+        c+=1
 
   else:
 
