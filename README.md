@@ -7,6 +7,7 @@
 #####P12: total number of papers in collaboration of author1. and author2
 #####CR1: total number of collaborators of author1
 #####CR2: total number of collaborators of author2
+#####CR12: total number of the same collaborators of author1 and author2
 #####CN1: total number of collaborations of author1
 #####CN2: total number of collaborations of author2
 #####CN12: total number of collaborations of author1. and author2 (=P12)
@@ -33,14 +34,15 @@
 1. last collaboration year of author2 with anyone (exp)
 1. P12
 1. W12
+1. *updated* CR12
 1. first collaboration ratio of author1. (P12/P1)
 1. first collaboration ratio of author2 (P12/P2)
 1. first collaboration ratio of author1. + author2 (P12/(P1+P2))
 1. second collaboration ratio of author1. (CN12/CN1)
 1. second collaboration ratio of author2 (CN12/CN2)
 1. second collaboration ratio of author1. + author2 (CN12/(CN1+CN2))
-1. third collaboration ratio of author1. (1/CR1)
-1. third collaboration ratio of author2 (1/CR2)
+1. third collaboration ratio of author1. (CR12/CR1)
+1. third collaboration ratio of author2 (CR12/CR2)
 1. forth collaboration ratio of author1. (W12/W1)
 1. forth collaboration ratio of author2 (W12/W2)
 1. last collaboration year of author1. and author2 (lin)
