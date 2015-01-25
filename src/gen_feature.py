@@ -1,7 +1,7 @@
 # python gen_feature.py (1)past_data (2)ans_data (3)data_to_be_processed (4)is_all?
 
 import sys
-# from collections import OrderedDict
+from collections import OrderedDict
 # import networkx as nx
 
 # open input
@@ -245,6 +245,7 @@ def get_label(author1, author2):
 # co_hash has key the author pair and value co_papers
 author_hash = {}
 co_hash = {}
+ans_hash = {}
 def createHash():
   for line in past_data:
     tokens = line.split(' ')
@@ -275,7 +276,20 @@ def createHash():
     else:
       co_hash[(tokens[0], tokens[1])] = [ paper_id ]
 
+  # gen ans hash
+  for line in ans_data:
+    tokens = line.split(' ')
+    ans_hash[ (tokens[0], tokens[1]) ] = 1
+  ans_data.seek(0)
+
   past_data.seek(0)
+
+# generate features
+def get_label_thru_hash(author1, author2):
+  if (author1, author2) in ans_hash:
+    return '+1'
+  else:
+    return '-1'
 
 def gen_features_thru_hash(author_pair):
 
@@ -414,25 +428,16 @@ def main():
 
     createHash()
 
-    c = 0
-    for ap in co_hash:
-      label = get_label(ap[0], ap[1]) if ans_data else '0'
-      if label=='+1':
 
-        features = gen_features_thru_hash((ap[0], ap[1]))
-        output_file.write(label)
-        for i, f in enumerate(features):
-          output_file.write(' {0}:{1}'.format(i+1, f))
-        output_file.write('\n')
-      else:
-        if c%9==0:
-          features = gen_features_thru_hash((ap[0], ap[1]))
-          output_file.write(label)
-          for i, f in enumerate(features):
-            output_file.write(' {0}:{1}'.format(i+1, f))
-          output_file.write('\n')
-          c = 0
-        c+=1
+
+    label = get_label_thru_hash(ap[0], ap[1]) if ans_data else '0'
+
+    features = gen_features_thru_hash((ap[0], ap[1]))
+    output_file.write(label)
+    for i, f in enumerate(features):
+      output_file.write(' {0}:{1}'.format(i+1, f))
+    output_file.write('\n')
+     
 
   else:
 
@@ -441,7 +446,7 @@ def main():
     author_pairs = getAuthorPairs()
     for ap in author_pairs:
 
-      label = get_label(ap[0], ap[1]) if ans_data else 0
+      label = get_label(ap[0], ap[1]) if ans_data else '0'
 
       features = gen_features_thru_hash((ap[0], ap[1]))
 
