@@ -136,31 +136,58 @@ def gen_features(author_pair):
     Y12[idx] += 1
     Y12_binary[idx] = 1
 
+  # conference
+  CONF = [ {}, {}, {} ]
+  for i in [0, 1]:
+    for p in P[i]:
+      p_attr = p.split(' ')
+      c = p_attr[1]
+      if c in CONF[i]:
+        CONF[i][c] += 1
+      else:
+        CONF[i][c] = 1
+  for paper in co_papers:
+    paper_attr = paper.split(' ')
+    if paper_attr[1] in CONF[2]:
+      CONF[2][paper_attr[1]] += 1
+    else:
+      CONF[2][paper_attr[1]] = 1
+
+  CONF_count = [ len(CONF[0].keys()), len(CONF[1].keys()), len( CONF[2].keys() ) ]
+  num_same_conf = max(CONF[2].values())
+
   # co ratios
   first_co_ratio1 = float(P_count[2])/float(P_count[0])
   first_co_ratio2 = float(P_count[2])/float(P_count[1])
   first_co_ratio12 = float(P_count[2])/float(P_count[0] + P_count[1])
+
   second_co_ratio1 = float(P_count[2])/float(CN_count[0])
   second_co_ratio2 = float(P_count[2])/float(CN_count[1])
   second_co_ratio12 = float(P_count[2])/float(CN_count[0] + CN_count[1])
+  
   third_co_ratio1 = float(CR_count[2])/float(CR_count[0])
   third_co_ratio2 = float(CR_count[2])/float(CR_count[1])
-  forth_co_ratio1 = float(weighted_lin[2])/float(weighted_lin[0])
-  forth_co_ratio2 = float(weighted_lin[2])/float(weighted_lin[1])
-  fifth_co_ratio1 = float(weighted_qua[2])/float(weighted_qua[0])
-  fifth_co_ratio2 = float(weighted_qua[2])/float(weighted_qua[1])
-  sixth_co_ratio1 = float(weighted_exp[2])/float(weighted_exp[0])
-  sixth_co_ratio2 = float(weighted_exp[2])/float(weighted_exp[1])
-
-  # same conference
-  same_conf = {}
-  for paper in co_papers:
-    paper_attr = paper.split(' ')
-    if paper_attr[1] in same_conf:
-      same_conf[paper_attr[1]] += 1
-    else:
-      same_conf[paper_attr[1]] = 1
-  num_same_conf = max(same_conf.values())
+  third_co_ratio12 = float(CR_count[2])/float(CR_count[0] + CR_count[1])
+  
+  forth_co_ratio1 = 1/float(CR_count[0])
+  forth_co_ratio2 = 1/float(CR_count[1])
+  forth_co_ratio12 = 1/float(CR_count[0] + CR_count[1])
+  
+  fifth_co_ratio1 = float(weighted_lin[2])/float(weighted_lin[0])
+  fifth_co_ratio2 = float(weighted_lin[2])/float(weighted_lin[1])
+  fifth_co_ratio12 = float(weighted_lin[2])/float(weighted_lin[0] + weighted_lin[1])
+  
+  sixth_co_ratio1 = float(weighted_qua[2])/float(weighted_qua[0])
+  sixth_co_ratio2 = float(weighted_qua[2])/float(weighted_qua[1])
+  sixth_co_ratio12 = float(weighted_qua[2])/float(weighted_qua[0] + weighted_qua[1])
+  
+  seventh_co_ratio1 = float(weighted_exp[2])/float(weighted_exp[0])
+  seventh_co_ratio2 = float(weighted_exp[2])/float(weighted_exp[1])
+  seventh_co_ratio12 = float(weighted_exp[2])/float(weighted_exp[0] + weighted_exp[1])
+  
+  eighth_co_ratio1 = float(CONF_count[2])/float(CONF_count[0])
+  eighth_co_ratio2 = float(CONF_count[2])/float(CONF_count[1])
+  eighth_co_ratio12 = float(CONF_count[2])/float(CONF_count[0] + CONF_count[1])
     
   # last publication year
   last_pub_year_lin = [0, 0, 0]
@@ -188,23 +215,36 @@ def gen_features(author_pair):
 
   # all features
   features = (
-              P_count[0], P_count[1], CR_count[0], CR_count[1], CN_count[0], CN_count[1], # 1~6
-              weighted_lin[0], weighted_lin[1], weighted_qua[0], weighted_qua[1], # 7~10
-              last_pub_year_lin[0], last_pub_year_qua[0], last_pub_year_exp[0], #11~13
-              last_pub_year_lin[1], last_pub_year_qua[1], last_pub_year_exp[1], #14~16
-              P_count[2], weighted_lin[2], weighted_qua[2], weighted_exp[2], CR_count[2], #17~21 
-              first_co_ratio1, first_co_ratio2, first_co_ratio12, #22~24
-              second_co_ratio1, second_co_ratio2, second_co_ratio12, #25~27
-              third_co_ratio1, third_co_ratio2, forth_co_ratio1, forth_co_ratio2, #28~31
-              fifth_co_ratio1, fifth_co_ratio2, sixth_co_ratio1, sixth_co_ratio2, #32~35
-              last_pub_year_lin[2], last_pub_year_qua[2], last_pub_year_exp[2], #36~38
-              num_same_conf, #39
-              Y[0][0], Y[0][1], Y[0][2], Y[0][3], #40~43
-              Y[1][0], Y[1][1], Y[1][2], Y[1][3], #44~47
-              Y_binary[0][0], Y_binary[0][1], Y_binary[0][2], Y_binary[0][3], #48~51
-              Y_binary[1][0], Y_binary[1][1], Y_binary[1][2], Y_binary[1][3], #52~55
-              Y12[0], Y12[1], Y12[2], Y12[3], #56~59
-              Y12_binary[0], Y12_binary[1], Y12_binary[2], Y12_binary[3] #60~63
+              P_count[0], P_count[1], CR_count[0], 
+              CR_count[1], CN_count[0], CN_count[1], 
+              weighted_lin[0], weighted_lin[1], weighted_qua[0], 
+              weighted_qua[1], last_pub_year_lin[0], last_pub_year_qua[0], 
+              last_pub_year_exp[0], last_pub_year_lin[1], last_pub_year_qua[1], 
+              last_pub_year_exp[1], P_count[2], weighted_lin[2], 
+              weighted_qua[2], weighted_exp[2], CR_count[2], 
+              first_co_ratio1, first_co_ratio2, first_co_ratio12, 
+              second_co_ratio1, second_co_ratio2, second_co_ratio12, 
+              third_co_ratio1, third_co_ratio2, third_co_ratio12, 
+              forth_co_ratio1, forth_co_ratio2, forth_co_ratio12
+              fifth_co_ratio1, fifth_co_ratio2, fifth_co_ratio12, 
+              sixth_co_ratio1, sixth_co_ratio2, sixth_co_ratio12,
+              seventh_co_ratio1, seventh_co_ratio2, seventh_co_ratio12,
+              eighth_co_ratio1, eighth_co_ratio2, eighth_co_ratio12,
+              CONF_count[0], CONF_count[1], CONF_count[2], 
+              last_pub_year_lin[2], last_pub_year_qua[2], last_pub_year_exp[2], 
+              num_same_conf, Y[0][0], Y[0][1], 
+              Y[0][2], Y[0][3], Y[1][0], 
+              Y[1][1], Y[1][2], Y[1][3], 
+              Y_binary[0][0], Y_binary[0][1], Y_binary[0][2], 
+              Y_binary[0][3], Y_binary[1][0], Y_binary[1][1], 
+              Y_binary[1][2], Y_binary[1][3], Y12[0], 
+              Y12[1], Y12[2], Y12[3], 
+              Y12_binary[0], Y12_binary[1], Y12_binary[2], 
+              Y12_binary[3], 
+              abs(last_pub_year_lin[0]-last_pub_year_lin[2])**2, 
+              abs(last_pub_year_lin[1]-last_pub_year_lin[2])**2, 
+              2**abs(last_pub_year_lin[0]-last_pub_year_lin[2]), 
+              2**abs(last_pub_year_lin[1]-last_pub_year_lin[2]), 
               )
   return features
 
