@@ -6,7 +6,7 @@ output = open(sys.argv[2], 'w+')
 c = 0
 for line in test_data:
   tokens = line.split(' ')
-  if tokens[0] == '+1':
+  if tokens[0] == '1':
   	output.write(line)
   else:
   	if c%8 == 0:
