@@ -225,7 +225,7 @@ def gen_features(author_pair):
               first_co_ratio1, first_co_ratio2, first_co_ratio12, 
               second_co_ratio1, second_co_ratio2, second_co_ratio12, 
               third_co_ratio1, third_co_ratio2, third_co_ratio12, 
-              forth_co_ratio1, forth_co_ratio2, forth_co_ratio12
+              forth_co_ratio1, forth_co_ratio2, forth_co_ratio12,
               fifth_co_ratio1, fifth_co_ratio2, fifth_co_ratio12, 
               sixth_co_ratio1, sixth_co_ratio2, sixth_co_ratio12,
               seventh_co_ratio1, seventh_co_ratio2, seventh_co_ratio12,
